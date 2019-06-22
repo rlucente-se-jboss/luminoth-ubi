@@ -158,9 +158,11 @@ Running the container on OpenShift is very straightforward.  Simply
 do the following after logging in to OpenShift as a normal user,
 
     oc new-project demo
-    oc import-image quay.io/rlucente-se-jboss/luminoth --confirm
+    oc import-image quay.io/your-quay-username/luminoth --confirm
     oc new-app luminoth
     oc expose svc/luminoth
+
+Of course, replace `your-quay-username` with your actual user name.
 
 ## Troubleshooting builds on RHEL 8
 If you get an error similar to ...

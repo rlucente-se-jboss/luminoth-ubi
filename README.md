@@ -4,9 +4,9 @@
 [Luminoth](https://luminoth.ai) is an open source computer vision
 toolkit.  As installed with this demo, Luminoth will recognize
 objects in a submitted image file, draw bounding boxes around the
-objects, and attempt to identify the object within a given probability.
-These instructions show how to run Luminoth in a container on
-[OpenShift Container Platform](https://openshift.com).
+objects, and attempt to identify the object within a given threshold
+probability.  These instructions show how to run Luminoth in a
+container on [OpenShift Container Platform](https://openshift.com).
 
 ## Download your pull secret
 With OpenShift 3.11, you need to supply a pull secret for Dockerfile
@@ -21,8 +21,10 @@ Select an existing service account or create a new one by pressing
 the `New Service Account` button.  Select the `OpenShift Secret`
 tab and then download your secret.
 
-Determine the name of your secret using the command:
+Move the downloaded file to the current directory and then determine
+the name of your secret using the commands:
 
+    mv /path/to/*secret.yaml .
     SECRET_NAME=$(grep name: *secret.yaml | awk '{print $2}')
 
 ## Installation
@@ -35,18 +37,20 @@ OpenShift environment:
 
     oc login -u <your username> <your OpenShift master hostname>
 
-Create a new project.
+Create a new project.  The name `demo` is used below but feel free
+to choose somthing else.  Just make sure you consistently use the
+same project name in the following commands.
 
-    oc new-project <your project name>
+    oc new-project demo
 
 Instantiate your secret and link it to the service accounts for
 your project.
 
-    oc create -f *secret.yaml -n <your project name>
+    oc create -f *secret.yaml -n demo
     oc secrets link default $SECRET_NAME --for=pull
     oc secrets link builder $SECRET_NAME
 
-Import the image stream for the python-36 builder image.
+Import the image metadata for the python-36 builder image.
 
     oc import-image registry.redhat.io/ubi7/python-36 --confirm
 
@@ -57,7 +61,7 @@ Create and expose the Luminoth application.
 
     oc expose svc/luminoth
 
-# Demo scenario
+## Demo scenario
 Use the command, 
 
     oc get routes

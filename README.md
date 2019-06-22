@@ -157,6 +157,7 @@ You can make the `luminoth` image publicly available via the
 Running the container on OpenShift is very straightforward.  Simply
 do the following after logging in to OpenShift as a normal user,
 
+    oc new-project demo
     oc import-image quay.io/rlucente-se-jboss/luminoth --confirm
     oc new-app luminoth
     oc expose svc/luminoth

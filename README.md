@@ -72,3 +72,12 @@ for object identification and `Browse` to a image file on your
 laptop.  Press the `Submit` button, and the Luminoth app will use
 trained models to identify objects within the image and draw bounding
 boxes around them.
+
+## Clean up
+To delete this project, use the commands:
+
+    oc delete all --all -n demo
+    oc delete project demo
+
+Make sure to use whatever your project name was if you didn't use
+`demo`.

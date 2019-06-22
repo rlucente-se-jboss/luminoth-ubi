@@ -150,6 +150,9 @@ and push the new image.
     podman login -u <your Quay username> quay.io
     podman push luminoth quay.io/<your user name>/luminoth
 
+You can make the `luminoth` image publicly available via the
+[Quay](https://quay.io) web interface.
+
 ## Run the quay.io container on OCP
 Running the container on OpenShift is very straightforward.  Simply
 do the following after logging in to OpenShift as a normal user,

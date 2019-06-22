@@ -81,3 +81,98 @@ To delete this project, use the commands:
 
 Make sure to use whatever your project name was if you didn't use
 `demo`.
+
+# RHEL 8 with container tools
+RHEL 8 includes Openshift Container Initiative (OCI) compliant tools
+to enable building containers on a RHEL 8 server.  These containers
+can be run directly using the `podman` tools or imported into a
+registry and run on OCP.  This set of commands will show how to
+build the container on RHEL 8, push to a public container registry,
+and then instantiate within OCP.
+
+## Install container tools on RHEL 8
+Use `subscription-manager` to register for updates and attach the
+desired pools to the system.  Alternatively, you can configure Red
+Hat satellite to provide updates.  How to do that is beyond the
+scope of these instructions.  Please see the official documentation
+for both [Red Hat Enterprise Linux 8](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/)
+and [Red Hat Satellite](https://access.redhat.com/documentation/en-us/red_hat_satellite/6.5/).
+
+As root, run the following commands once you're registered and you
+have access to the repositories listed below.
+
+    subscription-manager repos \
+        --enable=rhel-8-for-x86_64-baseos-rpms \
+        --enable=rhel-8-for-x86_64-appstream-rpms
+    yum -y update
+
+Next, install the container tools.  As root,
+
+    yum module install -y container-tools
+    yum -y clean all
+
+Now that the container tools are installed, you can logoff as root
+and login as an unprivileged user.
+
+## Use container tools to create the container image
+The container tools include buildah, podman, skopeo, and runc.
+We'll use buildah to create the image by leveraging the Universal
+Base Image for RHEL 7 with the pre-installed python tooling.  Luminoth
+will install with one command.  The other commands below configure
+the container by setting ports, entrypoints, etc.
+
+First, login to the `registry.redhat.io` secure container registry
+the same service account credentials as above for OpenShift.  Select
+the `Docker Login` tab instead of `OpenShift Secret`.  Make sure
+to use `podman` instead of `docker`.  As an unprivileged user, run
+the following commands:
+
+    podman login -u=<service account name> -p=<service account token> registry.redhat.io
+    container=$(buildah from ubi7/python-36)
+    buildah run $container pip install luminoth[tf]
+    buildah run $container /opt/app-root/bin/lumi checkpoint refresh
+    buildah run $container /opt/app-root/bin/lumi checkpoint download fast
+    buildah config --entrypoint \
+        "/opt/app-root/bin/lumi server web --host 0.0.0.0 --port 5000 --debug --checkpoint fast" \
+        $container
+    buildah commit $container luminoth
+    buildah unmount $newcontainer
+    buildah rm $newcontainer
+
+## Push the container to a public registry
+For this step, we will login to the public [Quay](https://quay.io/)
+image registry and push our newly created image there.  Create a
+Quay account if you don't already have one.
+
+As the same unprivileged user, login to Quay via the `podman` command
+and push the new image.
+
+    podman login -u <your Quay username> quay.io
+    podman push luminoth quay.io/<your user name>/luminoth
+
+## Run the quay.io container on OCP
+Running the container on OpenShift is very straightforward.  Simply
+do the following after logging in to OpenShift as a normal user,
+
+    oc import-image quay.io/rlucente-se-jboss/luminoth --confirm
+    oc new-app luminoth
+    oc expose svc/luminoth
+
+# Troubleshooting builds on RHEL 8
+If you get an error similar to ...
+`'overlay' is not supported over xfs at "~/.local/share/containers/storage/overlay"`
+then do the following:
+
+    rm -f .config/container/storage.conf
+    sudo yum -y reinstall containers-common
+
+And then make sure the file `~/.config/containers/storage.conf` has the contents:
+
+    [storage]
+       driver = "overlay"
+       runroot = "/run/user/1000"
+       graphroot = "/home/your-user-name/.local/share/containers/storage"
+       [storage.options]
+         mount_program = "/usr/bin/fuse-overlayfs"
+
+Of course, replace `your-user-name` in the above with your actual username.

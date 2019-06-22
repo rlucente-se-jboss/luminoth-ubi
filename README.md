@@ -88,7 +88,7 @@ to enable building containers on a RHEL 8 server.  These containers
 can be run directly using the `podman` tools or imported into a
 registry and run on OCP.  This set of commands will show how to
 build the container on RHEL 8, push to a public container registry,
-and then instantiate within OCP.
+and then instantiate within OpenShift.
 
 ## Install container tools on RHEL 8
 Use `subscription-manager` to register for updates and attach the
@@ -122,10 +122,10 @@ will install with one command.  The other commands below configure
 the container by setting ports, entrypoints, etc.
 
 First, login to the `registry.redhat.io` secure container registry
-the same service account credentials as above for OpenShift.  Select
-the `Docker Login` tab instead of `OpenShift Secret`.  Make sure
-to use `podman` instead of `docker`.  As an unprivileged user, run
-the following commands:
+using the same service account credentials as above for OpenShift.
+Select the `Docker Login` tab instead of `OpenShift Secret`.  Make
+sure to use `podman` instead of `docker`.  As an unprivileged user,
+run the following commands:
 
     podman login -u=<service account name> -p=<service account token> registry.redhat.io
     container=$(buildah from ubi7/python-36)
@@ -158,7 +158,7 @@ do the following after logging in to OpenShift as a normal user,
     oc new-app luminoth
     oc expose svc/luminoth
 
-# Troubleshooting builds on RHEL 8
+## Troubleshooting builds on RHEL 8
 If you get an error similar to ...
 `'overlay' is not supported over xfs at "~/.local/share/containers/storage/overlay"`
 then do the following:

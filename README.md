@@ -35,7 +35,9 @@ runtimes in order to install and run Luminoth.
 Download the Dockerfile in this project and then login to your
 OpenShift environment:
 
-    oc login -u <your username> <your OpenShift master hostname>
+    oc login -u your-ocp-username <your OpenShift master hostname>
+
+Of course, replace `your-ocp-username` with your actual OpenShift username.
 
 Create a new project.  The name `demo` is used below but feel free
 to choose somthing else.  Just make sure you consistently use the
@@ -147,11 +149,12 @@ Quay account if you don't already have one.
 As the same unprivileged user, login to Quay via the `podman` command
 and push the new image.
 
-    podman login -u <your Quay username> quay.io
-    podman push luminoth quay.io/<your user name>/luminoth
+    podman login -u your-quay-username quay.io
+    podman push luminoth quay.io/your-quay-username/luminoth
 
-You can make the `luminoth` image publicly available via the
-[Quay](https://quay.io) web interface.
+Make sure to replace `your-quay-username` with your actual Quay
+username.  You can make the `luminoth` image publicly available via
+the [Quay](https://quay.io) web interface.
 
 ## Run the quay.io container on OCP
 Running the container on OpenShift is very straightforward.  Simply

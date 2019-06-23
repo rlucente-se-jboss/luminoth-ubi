@@ -177,7 +177,7 @@ Make sure to replace `your-quay-username` with your actual Quay
 username.  You can make the `luminoth` image publicly available via
 the [Quay](https://quay.io) web interface.
 
-## Run the quay.io container on OCP
+## Run the quay.io hosted container on OCP
 Running the container on OpenShift is very straightforward.  Simply
 do the following after logging in to OpenShift as a normal user,
 

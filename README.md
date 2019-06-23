@@ -191,12 +191,18 @@ Of course, replace `your-quay-username` with your actual user name.
 ## Troubleshooting builds on RHEL 8
 If you get an error similar to ...
 `'overlay' is not supported over xfs at "~/.local/share/containers/storage/overlay"`
-then do the following:
+then do the following.
 
-    rm -f .config/container/storage.conf
-    sudo yum -y reinstall containers-common
+As root:
 
-And then make sure the file `~/.config/containers/storage.conf` has the contents:
+    yum -y reinstall containers-common
+
+For each unprivileged user on the system:
+
+    rm -f ~/.config/container/storage.conf
+
+And then, for each unprivileged user, make sure the file
+`~/.config/containers/storage.conf` has the contents:
 
     [storage]
        driver = "overlay"

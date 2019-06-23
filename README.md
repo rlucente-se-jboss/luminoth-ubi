@@ -39,7 +39,7 @@ Clone this github project to your workstation using:
 
 ## Install via registry.access.redhat.com (Option 1)
 This is the simplest method as `registry.access.redhat.com` does
-not require authorization.
+not require authentication.
 
 Import the image metadata for the python-36 builder image.
 

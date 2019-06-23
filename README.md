@@ -10,14 +10,13 @@ This application leverages a python 3.6 base layer, so there's no
 need to install and configure operating system runtimes or language
 runtimes in order to install and run Luminoth.
 
-These instructions are divided into two parts: installing directly
-within OpenShift; and building and pushing an image to a public
-registry using RHEL 8 container tools.
+These instructions are divided into two parts:
+* installing directly within OpenShift
+* building and pushing an image to a public registry using the RHEL 8 container tools
 
 # Installing directly within OpenShift
-When installing on OpenShift, two Dockerfiles are provided as
-examples for how to use the unauthenticated and authenticated
-registries.  Both options are described below.
+Instructions are provided on how to use both the unauthenticated
+and authenticated registries.  Both options are described below.
 
 ## Create an OpenShift project
 Login to the OpenShift environment:
@@ -53,11 +52,6 @@ Create and expose the Luminoth application.
 
 ## Install via registry.redhat.io (Option 2)
 Pulling from this registry requires that you authenticate to it.
-You'll need to fork this registry into your own github account and
-then modify the Dockerfile so that the first line is:
-
-    FROM registry.redhat.io/ubi7/python-36
-
 With OpenShift 3.11, you need to supply a pull secret for Dockerfile
 binary builds to get images from the authenticated Red Hat image
 registry.
@@ -84,14 +78,15 @@ your project.
     oc secrets link default $SECRET_NAME --for=pull
     oc secrets link builder $SECRET_NAME
 
-Import the image metadata for the python-36 builder image.
+Import the image metadata for the python-36 builder image.  Doing
+this will override the `FROM` line in the Dockerfile when creating
+the application using the docker strategy below.
 
     oc import-image registry.redhat.io/ubi7/python-36 --confirm
 
 Create and expose the Luminoth application.
 
     oc new-app . --name=luminoth --strategy=docker
-    oc start-build luminoth --from-file=Dockerfile
     oc expose svc/luminoth
 
 ## Demo scenario

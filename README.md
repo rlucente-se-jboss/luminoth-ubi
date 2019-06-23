@@ -200,7 +200,7 @@ As root:
 
 For each unprivileged user on the system:
 
-    rm -f ~/.config/container/storage.conf
+    rm -f ~/.config/containers/storage.conf
 
 And then, for each unprivileged user, make sure the file
 `~/.config/containers/storage.conf` has the contents:

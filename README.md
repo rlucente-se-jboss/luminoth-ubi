@@ -34,12 +34,13 @@ same project name in the following commands.
 
     oc new-project demo
 
+Clone this github project to your workstation using:
+
+    git clone https://github.com/rlucente-se-jboss/luminoth-ubi.git
+
 ## Install via registry.access.redhat.com (Option 1)
 This is the simplest method as `registry.access.redhat.com` does
-not require authorization.  Download the `Dockerfile.noauth` file
-and then do the following:
-
-    mv Dockerfile.noauth Dockerfile
+not require authorization.
 
 Import the image metadata for the python-36 builder image.
 
@@ -52,9 +53,10 @@ Create and expose the Luminoth application.
 
 ## Install via registry.redhat.io (Option 2)
 Pulling from this registry requires that you authenticate to it.
-Download the file `Dockerfile.auth` and then do the following:
+You'll need to fork this registry into your own github account and
+then modify the Dockerfile so that the first line is:
 
-    mv Dockerfile.auth Dockerfile
+    FROM registry.redhat.io/ubi7/python-36
 
 With OpenShift 3.11, you need to supply a pull secret for Dockerfile
 binary builds to get images from the authenticated Red Hat image

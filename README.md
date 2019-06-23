@@ -1,6 +1,4 @@
 # Image Object Recognition Demo
-
-## Overview
 [Luminoth](https://luminoth.ai) is an open source computer vision
 toolkit.  As installed with this demo, Luminoth will recognize
 objects in a submitted image file, draw bounding boxes around the
@@ -8,11 +6,61 @@ objects, and attempt to identify the object within a given threshold
 probability.  These instructions show how to run Luminoth in a
 container on [OpenShift Container Platform](https://openshift.com).
 
-## Download your pull secret
-With OpenShift 3.11, you need to supply a pull secret for Dockerfile
-binary builds to get images from the secure Red Hat image registry.
+This application leverages a python 3.6 base layer, so there's no
+need to install and configure operating system runtimes or language
+runtimes in order to install and run Luminoth.
 
-Browse to the [Red Hat trusted registry](https://registry.redhat.io).
+These instructions are divided into two parts: installing directly
+within OpenShift; and building and pushing an image to a public
+registry using RHEL 8 container tools.
+
+# Installing directly within OpenShift
+When installing on OpenShift, two Dockerfiles are provided as
+examples for how to use the unauthenticated and authenticated
+registries.  Both options are described below.
+
+## Create an OpenShift project
+Login to the OpenShift environment:
+
+    oc login -u your-ocp-username ocp-master-hostname
+
+where `your-ocp-username` and `ocp-master-hostname` refer to the
+unprivileged username on OpenShift and the URL for the OpenShift
+master host, respectively.
+
+Create a new project.  The name `demo` is used below but feel free
+to choose somthing else.  Just make sure you consistently use the
+same project name in the following commands.
+
+    oc new-project demo
+
+## Install via registry.access.redhat.com (Option 1)
+This is the simplest method as `registry.access.redhat.com` does
+not require authorization.  Download the `Dockerfile.noauth` file
+and then do the following:
+
+    mv Dockerfile.noauth Dockerfile
+
+Import the image metadata for the python-36 builder image.
+
+    oc import-image registry.access.redhat.com/ubi7/python-36 --confirm
+
+Create and expose the Luminoth application.
+
+    oc new-app . --name=luminoth --strategy=docker
+    oc expose svc/luminoth
+
+## Install via registry.redhat.io (Option 2)
+Pulling from this registry requires that you authenticate to it.
+Download the file `Dockerfile.auth` and then do the following:
+
+    mv Dockerfile.auth Dockerfile
+
+With OpenShift 3.11, you need to supply a pull secret for Dockerfile
+binary builds to get images from the authenticated Red Hat image
+registry.
+
+Browse to the [Red Hat registry](https://registry.redhat.io).
 Log in using your Red Hat customer portal credentials if prompted
 and then click on the `Service Accounts` link in the middle of the
 page to the right.
@@ -26,24 +74,6 @@ the name of your secret using the commands:
 
     mv /path/to/*secret.yaml .
     SECRET_NAME=$(grep name: *secret.yaml | awk '{print $2}')
-
-## Installation
-This application leverages a python 3.6 base layer, so there's no
-need to install and configure operating system runtimes or language
-runtimes in order to install and run Luminoth.
-
-Download the Dockerfile in this project and then login to your
-OpenShift environment:
-
-    oc login -u your-ocp-username <your OpenShift master hostname>
-
-Of course, replace `your-ocp-username` with your actual OpenShift username.
-
-Create a new project.  The name `demo` is used below but feel free
-to choose somthing else.  Just make sure you consistently use the
-same project name in the following commands.
-
-    oc new-project demo
 
 Instantiate your secret and link it to the service accounts for
 your project.
@@ -60,7 +90,6 @@ Create and expose the Luminoth application.
 
     oc new-app . --name=luminoth --strategy=docker
     oc start-build luminoth --from-file=Dockerfile
-
     oc expose svc/luminoth
 
 ## Demo scenario
@@ -123,14 +152,9 @@ Base Image for RHEL 7 with the pre-installed python tooling.  Luminoth
 will install with one command.  The other commands below configure
 the container by setting ports, entrypoints, etc.
 
-First, login to the `registry.redhat.io` secure container registry
-using the same service account credentials as above for OpenShift.
-Select the `Docker Login` tab instead of `OpenShift Secret`.  Make
-sure to use `podman` instead of `docker`.  As an unprivileged user,
-run the following commands:
+As an unprivileged user, run the following commands:
 
-    podman login -u=<service account name> -p=<service account token> registry.redhat.io
-    container=$(buildah from ubi7/python-36)
+    container=$(buildah from registry.access.redhat.com/ubi7/python-36)
     buildah run $container pip install luminoth[tf]
     buildah run $container /opt/app-root/bin/lumi checkpoint refresh
     buildah run $container /opt/app-root/bin/lumi checkpoint download fast

@@ -159,8 +159,8 @@ As an unprivileged user, run the following commands:
         "/opt/app-root/bin/lumi server web --host 0.0.0.0 --port 5000 --debug --checkpoint fast" \
         $container
     buildah commit $container luminoth
-    buildah unmount $newcontainer
-    buildah rm $newcontainer
+    buildah unmount $container
+    buildah rm $container
 
 ## Push the container to a public registry
 For this step, we will login to the public [Quay](https://quay.io/)
@@ -191,7 +191,7 @@ Of course, replace `your-quay-username` with your actual user name.
 ## Troubleshooting builds on RHEL 8
 If you get an error similar to ...
 `'overlay' is not supported over xfs at "~/.local/share/containers/storage/overlay"`
-then do the following.
+with the `podman push` command then do the following.
 
 As root:
 

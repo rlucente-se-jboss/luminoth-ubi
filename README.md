@@ -157,6 +157,7 @@ As an unprivileged user, run the following commands:
     buildah run $container /opt/app-root/bin/lumi checkpoint download fast
     buildah config --entrypoint \
         "/opt/app-root/bin/lumi server web --host 0.0.0.0 --port 5000 --debug --checkpoint fast" \
+        --port 5000 --user 1000 \
         $container
     buildah commit $container luminoth
     buildah unmount $container

@@ -111,8 +111,8 @@ Make sure to use whatever your project name was if you didn't use
 `demo`.
 
 # RHEL 8 with container tools
-RHEL 8 includes Openshift Container Initiative (OCI) compliant tools
-to enable building containers on a RHEL 8 server.  These containers
+RHEL 8 includes Open Container Initiative (OCI) compliant tools to
+enable building containers on a RHEL 8 server.  These containers
 can be run directly using the `podman` tools or imported into a
 registry and run on OCP.  This set of commands will show how to
 build the container on RHEL 8, push to a public container registry,
